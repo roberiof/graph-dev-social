@@ -1,0 +1,15 @@
+version: '3'
+services:
+  neo4j:
+    image: neo4j
+    container_name: neo4j
+    ports:
+      - "7475:7474"  # Porta HTTP
+      - "7688:7687"  # Porta Bolt
+    environment:
+      - NEO4J_AUTH=${NEO4J_USER}/${NEO4J_PASSWORD}
+    volumes:
+      - neo4j_data:/var/lib/neo4j/data
+
+volumes:
+  neo4j_data:
