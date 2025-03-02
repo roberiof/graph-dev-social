@@ -7,13 +7,6 @@ export async function GET(request: NextRequest, { params }: { params: { develope
   try {
     const developerId = parseInt((await params).developerId);
 
-    if (!developerId) {
-      return NextResponse.json(
-        { error: 'Incomplete data. Developer ID is required.' },
-        { status: 400 }
-      );
-    }
-
     const result = await session.run(
       'MATCH (d1:Developer)-[:KNOWS]->(d2:Developer) WHERE ID(d2) = $developerId RETURN d1, ID(d1) as id',
       { developerId: developerId }
