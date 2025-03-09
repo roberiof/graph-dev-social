@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   try {
     const { developerId, companyId } = await request.json()
 
-    if (!developerId || !companyId) {
+    if (!developerId && developerId !== 0 || !companyId && companyId !== 0) {
       return NextResponse.json(
         { error: 'Incomplete data. Developer ID and Company ID are required.' },
         { status: 400 }

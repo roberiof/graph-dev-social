@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   try {
     const { developerId, knownDeveloperId } = await request.json()
 
-    if (!developerId || !knownDeveloperId) {
+    if (!developerId && developerId !== 0 || !knownDeveloperId && knownDeveloperId !== 0) {
       return NextResponse.json(
         { error: 'Incomplete data. Both Developer IDs are required.' },
         { status: 400 }
