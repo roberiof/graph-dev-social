@@ -79,7 +79,7 @@ export function AddDeveloperModal({ open, onOpenChange }: AddDeveloperModalProps
           />
         </form>
         <DialogFooter>
-          <button type="submit" form="add-company-form" className="bg-black text-white px-4 py-2 rounded-md" >
+          <button type="submit" form="add-developer-form" className="bg-black text-white px-4 py-2 rounded-md" >
             {isSubmitting ? "Saving..." : "Save changes"}
           </button>
         </DialogFooter>
