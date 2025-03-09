@@ -7,28 +7,26 @@ import { useMemo, useState, useTransition } from "react";
 import { AddRelationModalProps } from "./types";
 import { getBody, updateGraphDataState } from "./utils";
 
+const relations = [
+  "Knows",
+  "Works-in"
+]
+
 export const AddRelationModal = ({ open, onOpenChange, selectedNode, setSelectedNode }: AddRelationModalProps) => {
   const { graphData, setGraphData } = useGraphData();
 
   const [selectedTargetNode, setSelectedTargetNode] = useState<string>("");
-  const [selectRelationType, setSelectRelationType] = useState<string>("");
+  const [selectRelationType, setSelectRelationType] = useState<"Knows" | "Works-in">("Knows");
   const [isPendingAddRelation, startTransitionAddRelation] = useTransition();
 
-  const relations = [
-    "Conhece (knows)",
-    "Trabalha em (works-in)"
-  ]
-
   const availableNodes = useMemo(() => {
-
-    
-    if (selectRelationType.includes("knows")) {
+    if (selectRelationType === "Knows") {
       const alreadyKnownsDevelopersIds = graphData?.links.filter(link => (link.source.id === selectedNode.id || link.target.id === selectedNode.id) && link.label === "knows").map(relation => relation.source.id === selectedNode.id ? relation.target.id : relation.source.id)
 
       return graphData?.nodes.filter(node => node.type === "Developer" && node.id !== selectedNode.id && !alreadyKnownsDevelopersIds?.includes(node.id))
     }
 
-    if (selectRelationType.includes("works-in")) {
+    if (selectRelationType === "Works-in") {
       const alreadyWorksInCompaniesIds = graphData?.links.filter(link => (link.source.id === selectedNode.id || link.target.id === selectedNode.id) && link.label === "works-in").map(relation => relation.source.id === selectedNode.id ? relation.target.id : relation.source.id)
 
       return graphData?.nodes.filter(node => node.type === "Company" && !alreadyWorksInCompaniesIds?.includes(node.id))
@@ -47,12 +45,12 @@ export const AddRelationModal = ({ open, onOpenChange, selectedNode, setSelected
       const response = await apiClient.post(`/developers/${relationType}`, body);
 
       if (response.error) {
-        errorToast(`Erro ao adicionar relação`);
+        errorToast(`Error adding relation`);
       } else {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         updateGraphDataState(relationType, selectedNode, id, availableNodes ?? [], setGraphData as any)
         onOpenChange(false);
-        successToast(`Relação adicionada com sucesso`);  
+        successToast(`Relation added successfully`);  
         setSelectedNode(null);
       };
     });  
@@ -71,14 +69,13 @@ export const AddRelationModal = ({ open, onOpenChange, selectedNode, setSelected
       <div className='space-y-4 h-[200px]'>
         <SearchSelect
           options={relations}
-          placeholder="Selecione um tipo de relação"
-          onChange={setSelectRelationType}
+          onChange={(value) => setSelectRelationType(value as "Knows" | "Works-in")}
           value={selectRelationType}
         />
         {selectRelationType && (
           <SearchSelect
             options={availableNodes?.map(node => node.name) ?? []}
-            placeholder="Selecione um nó para relacionar"
+            placeholder="Select a node to relate"
             onChange={setSelectedTargetNode}
             value={selectedTargetNode}
             ></SearchSelect>
@@ -87,11 +84,11 @@ export const AddRelationModal = ({ open, onOpenChange, selectedNode, setSelected
       <DialogFooter>
         <button className='bg-gray-500 text-white px-4 py-2 rounded-md w-full' onClick={() => onOpenChange(false)}>Cancelar</button>
         <button
-          onClick={() => handleAddRelation(selectedTargetNodeId, selectRelationType.includes("knows") ? "knows" : "works-in")}
+          onClick={() => handleAddRelation(selectedTargetNodeId, selectRelationType.toLowerCase() as "knows" | "works-in")}
           className=" bg-blue-500 text-white px-4 py-2 rounded-md w-full"
           disabled={isPendingAddRelation}
         >
-            {isPendingAddRelation ? "Adicionando..." : "Adicionar Relação"}
+            {isPendingAddRelation ? "Adding..." : "Add Relation"}
         </button>
       </DialogFooter>
     </DialogContent>

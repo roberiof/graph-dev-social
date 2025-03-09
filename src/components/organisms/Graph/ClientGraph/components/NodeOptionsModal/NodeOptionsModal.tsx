@@ -25,13 +25,13 @@ const NodeOptionsModal = ({
     
 
       if (response.error) {
-        errorToast(`Erro ao excluir ${selectedNode.type}`);
+        errorToast(`Error removing ${selectedNode.type}`);
       } else {
         setGraphData(prev => ({
           links: prev?.links.filter((link: ILink) => link.source.id !== selectedNode.id && link.target.id !== selectedNode.id) ?? [],
           nodes: prev?.nodes.filter((node: INode) => node.id !== selectedNode.id) ?? []
         }));
-        successToast(`${selectedNode.type} excluído com sucesso`);
+        successToast(`${selectedNode.type} removed successfully`);
       };
 
       setSelectedNode(null);
@@ -58,14 +58,14 @@ const NodeOptionsModal = ({
             </DialogDescription>
           </DialogHeader>
 
-          <div className='space-y-4'>
+          <div className='space-y-2'>
             {canAddRelationsTypes.includes(selectedNode.type) && 
               <>
                 <button
                   onClick={() => setOpenAddRelationModal(true)}
                   className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-md w-full"
                 >
-                  Adicionar Relação
+                  Add relation
                 </button>
                 <AddRelationModal 
                   open={openAddRelationModal}
@@ -79,7 +79,7 @@ const NodeOptionsModal = ({
               onClick={handleDelete}
               className="bg-red-500 text-white px-4 py-2 rounded-md w-full"
             >
-              {isPendingDelete ? "Excluindo..." : "Excluir Nó"}
+              {isPendingDelete ? "Removing node..." : "Remove"}
             </button>
           </div>
         </DialogContent>

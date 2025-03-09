@@ -10,9 +10,10 @@ export const apiClient = {
     });
     return response.json();
   },
-  delete: async (endpoint: string) => {
+  delete: async <T>(endpoint: string, data?: T) => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${endpoint}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      body: JSON.stringify(data)
     });
     return response.json();
   }

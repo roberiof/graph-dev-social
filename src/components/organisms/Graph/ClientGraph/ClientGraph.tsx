@@ -1,10 +1,12 @@
 'use client';
 
+import { companyColor, developerColor } from '@/common/constants/colors';
 import { useGraphData } from '@/common/context/GraphData';
-import { INode } from '@/common/interfaces/types';
+import { ILink, INode } from '@/common/interfaces/types';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/Addons.js';
+import LinkOptionsModal from './components/LinkOptionsModal/LinkOptionsModal';
 import NodeOptionsModal from './components/NodeOptionsModal/NodeOptionsModal';
 import { ClientGraphProps } from './types';
 
@@ -14,7 +16,7 @@ export default function ClientGraph({ initialData }: ClientGraphProps) {
   const { graphData, setGraphData } = useGraphData();
   const extraRenderers = [new CSS2DRenderer()];
   const [selectedNode, setSelectedNode] = useState<INode | null>(null);
-  const [optionsModalOpen, setOptionsModalOpen] = useState(false);
+  const [selectedLink, setSelectedLink] = useState<ILink | null>(null);
 
   useEffect(() => {
     if (graphData) return;
@@ -26,13 +28,16 @@ export default function ClientGraph({ initialData }: ClientGraphProps) {
   return (
     <>
       <ForceGraph3D
+        backgroundColor='rgba(0, 0, 0, 0.90)'
         graphData={graphData}
-        linkDirectionalParticles={20}
-        linkDirectionalParticleSpeed={0.005}
+        linkColor={link => link.label === 'knows' ? developerColor : companyColor}
+        linkOpacity={0.5}
         extraRenderers={extraRenderers}
+        onLinkClick={(link) => {
+          setSelectedLink(link as ILink);
+        }}
         onNodeClick={(node) => {
           setSelectedNode(node as INode);
-          setOptionsModalOpen(true);
         }}
         nodeThreeObject={node => {
           const nodeEl = document.createElement('div');
@@ -46,29 +51,12 @@ export default function ClientGraph({ initialData }: ClientGraphProps) {
           nodeEl.className = 'node-label';  
           return new CSS2DObject(nodeEl);
         }}
-      linkThreeObject={(link) => {
-          const linkEl = document.createElement('div');
-          linkEl.textContent = link.label?.toString() ?? '';
-          linkEl.style.color = '#ffffff';
-          linkEl.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-          linkEl.style.padding = '2px 6px';
-          linkEl.style.borderRadius = '4px';
-          linkEl.style.fontSize = '10px';
-          linkEl.className = 'link-label';
-          return new CSS2DObject(linkEl);
-        }}
-        linkPositionUpdate={(sprite, { start, end }) => {
-          const middle = {
-            x: start.x + (end.x - start.x) / 2,
-            y: start.y + (end.y - start.y) / 2,
-            z: start.z + (end.z - start.z) / 2
-          };
-          Object.assign(sprite.position, middle);
-        }}
         nodeThreeObjectExtend={true}
         nodeLabel={node => "Id:" + (node.id?.toString() ?? 'Not found')}
+        linkLabel={link => `Relation: ${link.label}`}
       />
-      <NodeOptionsModal open={optionsModalOpen} onOpenChange={setOptionsModalOpen} selectedNode={selectedNode} setSelectedNode={setSelectedNode}/>
+      <NodeOptionsModal selectedNode={selectedNode} setSelectedNode={setSelectedNode}/>
+      <LinkOptionsModal selectedLink={selectedLink} setSelectedLink={setSelectedLink}/>
     </>
   );
 }
