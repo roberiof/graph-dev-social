@@ -5,7 +5,8 @@ import { useGraphData } from '@/common/context/GraphData';
 import { ILink, INode } from '@/common/interfaces/types';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
-import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/Addons.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+
 import LinkOptionsModal from './components/LinkOptionsModal/LinkOptionsModal';
 import NodeOptionsModal from './components/NodeOptionsModal/NodeOptionsModal';
 import { ClientGraphProps } from './types';
@@ -13,17 +14,23 @@ import { ClientGraphProps } from './types';
 const ForceGraph3D = dynamic(() => import('react-force-graph-3d'), { ssr: false });
 
 export default function ClientGraph({ initialData }: ClientGraphProps) {
-  const { graphData, setGraphData } = useGraphData();
-  const extraRenderers = [new CSS2DRenderer()];
+  const [extraRenderers, setExtraRenderers] = useState<unknown[]>([]);
   const [selectedNode, setSelectedNode] = useState<INode | null>(null);
-  const [selectedLink, setSelectedLink] = useState<ILink | null>(null);
+  const [selectedLink, setSelectedLink] = useState<ILink | null>(null); 
 
+  const { graphData, setGraphData } = useGraphData();
+  
   useEffect(() => {
     if (graphData) return;
     setGraphData(initialData);
   }, [graphData, initialData, setGraphData]); 
 
-  if (!graphData) return null;
+  useEffect(() => {
+    setExtraRenderers([new CSS2DRenderer()]);
+  }, []);
+  
+
+  if (!graphData || extraRenderers.length === 0) return null;
 
   return (
     <>
