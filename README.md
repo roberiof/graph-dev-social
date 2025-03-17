@@ -15,6 +15,8 @@ Make sure your .env file is properly configured (you can copy the .env.example)
 docker compose up
 ```
 
+You can the Neo4j browser interface in [http://localhost:7475/browser/]()
+
 ### 4️⃣ Run the Next.js server
 ```
 npm run dev
