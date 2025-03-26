@@ -10,12 +10,6 @@ export async function DELETE(
   try {
     const id = parseInt((await params).id);
 
-    if (!id) {
-      return NextResponse.json(
-        { error: 'Incomplete data. Id is required.' },
-        { status: 400 }
-      );
-    }
     const result = await session.run(
       'MATCH (c:Company) WHERE ID(c) = $id RETURN c',
       { id }
